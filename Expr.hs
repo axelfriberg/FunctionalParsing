@@ -1,3 +1,5 @@
+-- contains a data type for representing an arithmetic expression, an expression parser, an expression evaluator, 
+-- and a function for converting the representation to a string.
 module Expr(Expr, T, parse, fromString, value, toString) where
 
 {-

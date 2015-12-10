@@ -1,3 +1,6 @@
+-- contains a data type for representing a statement, a statement parser, 
+-- a function to interpret a list of statements, and a function for converting the representation to a string.
+
 module Statement(T, parse, toString, fromString, exec) where
 import Prelude hiding (return, fail)
 import Parser hiding (T)

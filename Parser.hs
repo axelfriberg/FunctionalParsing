@@ -1,3 +1,5 @@
+-- contains a number of derived parsers and parser operators.
+
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token,
               spaces, word, (-#), (#-)) where
@@ -28,6 +30,10 @@ spaces =  error "spaces not implemented"
 token :: Parser a -> Parser a
 token m = m #- spaces
 
+-- letter is a parser for a letter as defined by the Prelude function isAlpha (True if the character is an alphabetic character).
+{- l1 = letter "abc"   {- Just('a',"bc") -}
+l2 = letter "123"   {- Nothing -}
+l3 = letter ""      {- Nothing -} -}
 letter :: Parser Char
 letter =  error "letter not implemented"
 
