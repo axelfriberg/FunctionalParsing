@@ -3,7 +3,7 @@
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token,
               spaces, word, (-#), (#-)) where
-import Prelude hiding (return, fail)
+import Prelude hiding (return, fail, iterate)
 import Data.Char
 import CoreParser
 infixl 7 -#, #- 
@@ -16,6 +16,11 @@ err message cs = error (message++" near "++cs++"\n")
 -- Iterates a parser as long as it succeeds.
 iter :: Parser a -> Parser [a]  
 iter m = m # iter m >-> cons ! return [] 
+
+-- Applies the parser m to the input string i times with the result in a list with i elements.
+iterate :: Parser a -> Int -> Parser [a]
+iterate m 0 = return []
+iterate m i = m # iterate m (i-1) >-> cons
 
 cons(a, b) = a:b
 
@@ -40,8 +45,9 @@ letter =  (char ? isAlpha)
 word :: Parser String
 word = token (letter # iter letter >-> cons)
 
+-- The parser chars n accepts n characters.
 chars :: Int -> Parser String
-chars n =  error "chars not implemented"
+chars n =  iterate char n
 
 accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
@@ -63,4 +69,3 @@ number' n = digitVal #> (\ d -> number' (10*n+d))
           ! return n
 number :: Parser Integer
 number = token (digitVal #> number')
-
