@@ -25,8 +25,9 @@ m -# n = error "-# not implemented"
 (#-) :: Parser a -> Parser b -> Parser a
 m #- n = error "#- not implemented"
 
+-- spaces accepts any number of whitespace characters as defined by the Prelude function isSpace.
 spaces :: Parser String
-spaces =  error "spaces not implemented"
+spaces =  iter (char ? isSpace)
 
 token :: Parser a -> Parser a
 token m = m #- spaces

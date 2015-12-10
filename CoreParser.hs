@@ -69,7 +69,7 @@ fail cs = Nothing
     Nothing -> Nothing
 
 -- Provides the means to make the result from one parser available to another.
--- After applying the first parser to cs both the result and the raminder cs are given to the second operand.
+-- After applying the first parser to cs both the result and the remainder cs are given to the second operand.
 (#>) :: Parser a -> (a -> Parser b) -> Parser b 
 (p #> k) cs = 
     case p cs of
