@@ -24,6 +24,9 @@ iterate m i = m # iterate m (i-1) >-> cons
 
 cons(a, b) = a:b
 
+-- The parser m -# n accepts the same input as m # n, but returns just the result from the n parser. 
+-- The function should be declared as a left associative infix operator with precedence 7
+-- (accept "read" -# word) "read count;" -> Just ("count", ";")
 (-#) :: Parser a -> Parser b -> Parser b
 m -# n = error "-# not implemented"
 
@@ -52,8 +55,9 @@ chars n =  iterate char n
 accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
 
+-- The parser require w accepts the same string input as accept w but reports the missing string using err in case of failure.
 require :: String -> Parser String
-require w  = error "require not implemented"
+require w  = (accept w ! err w)
 
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
