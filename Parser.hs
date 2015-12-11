@@ -31,7 +31,7 @@ cons(a, b) = a:b
 m -# n = m # n >-> snd
 
 (#-) :: Parser a -> Parser b -> Parser a
-m #- n = error "#- not implemented"
+m #- n = m # n >-> fst
 
 -- spaces accepts any number of whitespace characters as defined by the Prelude function isSpace.
 spaces :: Parser String
