@@ -11,7 +11,7 @@ infixl 7 -#, #-
 type T a = Parser a
 
 err :: String -> Parser a
-err message cs = error (message++" near "++cs++"\n")
+err message cs = error (message++" near "++cs++"\n") 
 
 -- Iterates a parser as long as it succeeds.
 iter :: Parser a -> Parser [a]  
@@ -28,7 +28,7 @@ cons(a, b) = a:b
 -- The function should be declared as a left associative infix operator with precedence 7
 -- (accept "read" -# word) "read count;" -> Just ("count", ";")
 (-#) :: Parser a -> Parser b -> Parser b
-m -# n = error "-# not implemented"
+m -# n = m # n >-> snd
 
 (#-) :: Parser a -> Parser b -> Parser a
 m #- n = error "#- not implemented"
