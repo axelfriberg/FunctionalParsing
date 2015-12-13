@@ -37,6 +37,7 @@ m #- n = m # n >-> fst
 spaces :: Parser String
 spaces =  iter (char ? isSpace)
 
+-- We define token which for a given parser will return a parser which will remove any whitespace after the accepted string.
 token :: Parser a -> Parser a
 token m = m #- spaces
 
@@ -45,6 +46,7 @@ token m = m #- spaces
 letter :: Parser Char
 letter =  (char ? isAlpha)
 
+-- word "count := count+1" -> Just("count", ":= count+1")
 word :: Parser String
 word = token (letter # iter letter >-> cons)
 
@@ -59,17 +61,25 @@ accept w = (token (chars (length w))) ? (==w)
 require :: String -> Parser String
 require w  = (accept w ! err w)
 
+-- A parser accepting a given character is easily defined.
+-- The predicate decides if the given character is the the same as the one accepted by char.
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
 
+-- Accepts one digit
+-- digit "123" -> Just(’1’,"23")
 digit :: Parser Char 
 digit = char ? isDigit 
 
+-- We may use it to define a parser which accepts a digit and returns an Int using digitToInt from the Prelude.
+-- digitVal "123" -> Just(1, "23")
 digitVal :: Parser Integer
 digitVal = digit >-> digitToInt >-> fromIntegral
 
 number' :: Integer -> Parser Integer
 number' n = digitVal #> (\ d -> number' (10*n+d))
           ! return n
+
+-- number "123 abc" -> Just(123, "abc")
 number :: Parser Integer
 number = token (digitVal #> number')

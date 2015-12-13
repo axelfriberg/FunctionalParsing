@@ -29,6 +29,8 @@ import Prelude hiding (return, fail)
 import Parser hiding (T)
 import qualified Dictionary
 
+-- The result of the parser
+-- An expression can be either a number, variable, add/sub/mul/div between two expr
 data Expr = Num Integer | Var String | Add Expr Expr 
        | Sub Expr Expr | Mul Expr Expr | Div Expr Expr
          deriving Show
@@ -39,27 +41,43 @@ var, num, factor, term, expr :: Parser Expr
 
 term', expr' :: Expr -> Parser Expr
 
+-- String of letters
 var = word >-> Var
 
+-- String of digits
 num = number >-> Num
 
+-- Parser that will accept * or / and return a Mul or Div
+-- mulOp "*2*3 -> Just(Mul, "2*3")
 mulOp = lit '*' >-> (\ _ -> Mul) !
         lit '/' >-> (\ _ -> Div)
 
+-- Parser that will accept + or - and return a Add or Sub
 addOp = lit '+' >-> (\ _ -> Add) !
         lit '-' >-> (\ _ -> Sub)
 
+-- Used for transformation, takes and expression and a (operator,expr) pair and makes it into a new expression?
+-- bldOp (Num 1) (Mul, Num 2) -> Mul Num 1 Num 2
 bldOp e (oper,e') = oper e e'
 
+-- Returns a Parser Expr
 factor = num !
          var !
          lit '(' -# expr #- lit ')' !
          err "illegal factor"
-             
+
+-- Does mulOp and sends the remainder string to factor which is combined into a pair. This pair is transformed by bldOp. 
+-- The transformed result is geven recursively to term' which will finda a new mulOp or terminate.
+-- if the input doesnt start with a mulOp we just return e.      
 term' e = mulOp # factor >-> bldOp e #> term' ! return e
+
+-- Does factor function and gives the result and remainder to term'.
+-- term "1*2" -> Just(Mul (Num 1) (Num 2), "")
 term = factor #> term'
        
+-- The same as above but with addOp instead.
 expr' e = addOp # term >-> bldOp e #> expr' ! return e
+-- term "1+2" -> Just(Add (Num 1) (Num 2), "")
 expr = term #> expr'
 
 parens cond str = if cond then "(" ++ str ++ ")" else str
@@ -72,9 +90,27 @@ shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 
+{- 
+Implement the function value in Expr. 
+The expression value e dictionary should return the value of e if all the variables occur in dictionary and there is no division by zero. 
+Otherwise an error should be reported using error.
+testValue string = value (fromString string) dict
+n1 = testValue "1"
+n2 = testValue "x"
+n3 = testValue "x+y"
+n4 = testValue "x-y-y"
+n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}
+n31 = testValue "2+z"     {-  Expr.value: undefined variable z -} 
+-}
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Num n) _ = error "value not implemented"
+value e _ = 1
 
+numOps :: Expr -> Integer  
+numOps (Mul (Num x1) (Num x2)) = x1 * x2 
+numOps (Div (Num x1) (Num x2)) = x1 `div` x2 
+numOps (Add (Num x1) (Num x2)) = x1 + x2 
+numOps (Sub (Num x1) (Num x2)) = x1 - x2 
+ 
 instance Parse Expr where
     parse = expr
     toString = shw 0
