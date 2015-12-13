@@ -103,14 +103,23 @@ n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}
 n31 = testValue "2+z"     {-  Expr.value: undefined variable z -} 
 -}
 value :: Expr -> Dictionary.T String Integer -> Integer
-value e _ = 1
+value (Num n) _ = n
+value (Var v) d = case (Dictionary.lookup v d) of
+  Nothing -> error ("Expr.value: undefined variable " ++ v)
+  Just a -> a
+value (Mul e1 e2) d = value e1 d * value e2 d
+value (Div e1 e2) d = case value e2 d of
+  0 -> error "Expr.value: division by 0"
+  _ -> value e1 d `div` value e2 d
+value (Add e1 e2) d = value e1 d + value e2 d
+value (Sub e1 e2) d = value e1 d - value e2 d
 
 numOps :: Expr -> Integer  
 numOps (Mul (Num x1) (Num x2)) = x1 * x2 
 numOps (Div (Num x1) (Num x2)) = x1 `div` x2 
 numOps (Add (Num x1) (Num x2)) = x1 + x2 
 numOps (Sub (Num x1) (Num x2)) = x1 - x2 
- 
+
 instance Parse Expr where
     parse = expr
     toString = shw 0
