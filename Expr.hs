@@ -94,13 +94,6 @@ shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
 Implement the function value in Expr. 
 The expression value e dictionary should return the value of e if all the variables occur in dictionary and there is no division by zero. 
 Otherwise an error should be reported using error.
-testValue string = value (fromString string) dict
-n1 = testValue "1"
-n2 = testValue "x"
-n3 = testValue "x+y"
-n4 = testValue "x-y-y"
-n21 = testValue "1/(2-y)" {-  Expr.value: division by 0 -}
-n31 = testValue "2+z"     {-  Expr.value: undefined variable z -} 
 -}
 value :: Expr -> Dictionary.T String Integer -> Integer
 value (Num n) _ = n
@@ -113,12 +106,6 @@ value (Div e1 e2) d = case value e2 d of
   _ -> value e1 d `div` value e2 d
 value (Add e1 e2) d = value e1 d + value e2 d
 value (Sub e1 e2) d = value e1 d - value e2 d
-
-numOps :: Expr -> Integer  
-numOps (Mul (Num x1) (Num x2)) = x1 * x2 
-numOps (Div (Num x1) (Num x2)) = x1 `div` x2 
-numOps (Add (Num x1) (Num x2)) = x1 + x2 
-numOps (Sub (Num x1) (Num x2)) = x1 - x2 
 
 instance Parse Expr where
     parse = expr

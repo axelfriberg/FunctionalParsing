@@ -26,23 +26,6 @@ data Statement =
     Read String |
     Write Expr.T
     deriving Show
-{-
-Define a parsing function for each kind of statement. If the parser has accepted the first reserved word in a statement, 
-you should use require rather than accept to parse other reserved words or symbols in order to get better error messages in case of failure. 
-An example:
-   assignment = word #- accept ":=" # Expr.parse 
-                     #- require ";" >-> buildAss
-   buildAss (v, e) = Assignment v e
--}
-
-{-
-The parser m #- n accepts the same input as m # n, but returns the result from the m parser.
-This parser applies two parsers in sequence where the remainder string from the first one is fed into the other, the results of the two parsers are combined into a pair.
-Does word function and sends the remainder to accept ":=", 
-This parser applies two parsers in sequence where the remainder string from the first one is fed into the other, 
-the results of the two parsers are combined into a pair.
-The word is then combined with Expr.parse and sent to require
--}
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss
 buildAss (v, e) = Assignment v e -- Variable Expr
 
@@ -66,25 +49,6 @@ buildRead r = Read r
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
 buildWrite e = Write e
 
-{-
-The function exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer] takes a list of statements to be executed, 
-a dictionary containing variable/value pairs, and a list of integers containing numbers that may be read by read statements 
-and the returned list contains the numbers produced by write statements. 
-
-The function exec is defined using pattern matching on the first argument. 
-If it is empty an empty integer list is returned. The other patterns discriminate over the first statement in the list. 
-As an example the execution of a conditional statement may be implemented by
-   exec (If cond thenStmts elseStmts: stmts) dict input =
-       if (Expr.value cond dict)>0
-       then exec (thenStmts: stmts) dict input
-       else exec (elseStmts: stmts) dict input
-
-For each kind of statement there will be a recursive invocation of exec. 
-A write statement will add a value to the returned list, while an assignment will make a recursive call with a new dictionary.
-
-list of statements to be executed ->a dictionary containing variable/value pairs -> list of integers containing numbers that may be read by read statements ->
-the returned list contains the numbers produced by write statements. 
--}
 exec :: [T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
 exec (Assignment var expr: stmts) dict input =
