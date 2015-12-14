@@ -12,9 +12,14 @@ import Parser hiding (T)
 import qualified Statement
 import qualified Dictionary
 import Prelude hiding (return, fail)
-newtype T = Program [Statement.T] -- to be defined
+newtype T = Program [Statement.T]
 instance Parse T where
   parse = iter Statement.parse >-> Program
-  toString = error "Program.toString not implemented"
-             
-exec = error "Program.exec not implemented"
+  toString (Program p) = concatMap Statement.toString p
+
+{-             
+Implement toString :: T -> String in Statement and Program. 
+A newline character should be inserted after each statement and some keywords, but no indentation of lines is required. 
+However, it will be appreciated. No spurious empty lines should appear in the output.
+-}
+exec (Program p) = Statement.exec p Dictionary.empty 

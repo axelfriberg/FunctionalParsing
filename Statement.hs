@@ -106,7 +106,15 @@ exec ((Read s): stmts) dict (i:input) =
 exec ((Write e): stmts) dict input = 
     Expr.value e dict : exec stmts dict input
 
+shw :: Statement -> String
+shw (Assignment var expr) = var ++ ":=" ++ Expr.toString expr ++ ";\n"
+shw (Begin ss) = "begin\n" ++ concat (map shw ss) ++ "end\n"
+shw (Skip) = "skip;\n"
+shw (If cond thenStmts elseStmts) = "if " ++ Expr.toString cond ++ " then\n" ++ shw thenStmts ++ "else \n" ++ shw elseStmts
+shw (While cond stmt) = "while " ++ Expr.toString cond ++ " do \n" ++ shw stmt
+shw (Read s) = "read " ++ s ++ ";\n"
+shw (Write e) = "write " ++ Expr.toString e ++ ";\n"
 
 instance Parse Statement where
   parse = assignment ! begin ! skip ! ifElse ! while ! read ! write
-  toString = error "Statement.toString not implemented"
+  toString = shw
