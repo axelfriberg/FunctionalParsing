@@ -4,9 +4,7 @@ module TestExpr where
 import qualified Dictionary
 import Expr
 
-dict = Dictionary.insert ("x", 1) $
-       Dictionary.insert ("y", 2) $
-       Dictionary.empty 
+dict = Dictionary.insert ("x", 1) $ Dictionary.insert ("y", 2) $ Dictionary.empty 
 
 testValue string = value (fromString string) dict
 

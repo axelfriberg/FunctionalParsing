@@ -54,6 +54,10 @@ word = token (letter # iter letter >-> cons)
 chars :: Int -> Parser String
 chars n =  iterate char n
 
+{-
+accept "while" "while x do x:=x-1" -> Just("while", "x do x:=x-1")
+accept "if" "while x do x:=x-1" -> Nothing
+-}
 accept :: String -> Parser String
 accept w = (token (chars (length w))) ? (==w)
 
