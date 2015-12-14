@@ -56,7 +56,7 @@ ifElse = accept "if" -# Expr.parse # require "then" -# parse  # require "else" -
 buildIf ((e, s1), s2) = If e s1 s2
 
 while = accept "while" -# Expr.parse # require "do" -# parse  >-> buildWhile
-buildWhile (e, s) = If e s
+buildWhile (e, s) = While e s
 
 -- accept "read" "read k;" -> Just("read", "k;")
 -- Sends remainder to word which breaks out k and keeps this as result. Then requires ; and just keeps k. the k is then used in Read k. 
@@ -74,5 +74,5 @@ exec (If cond thenStmts elseStmts: stmts) dict input =
     else exec (elseStmts: stmts) dict input
 
 instance Parse Statement where
-  parse = error "Statement.parse not implemented"
+  parse = assignment ! begin ! skip ! ifElse ! while ! read ! write
   toString = error "Statement.toString not implemented"
