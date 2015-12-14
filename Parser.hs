@@ -1,5 +1,4 @@
 -- contains a number of derived parsers and parser operators.
-
 module Parser(module CoreParser, T, digit, digitVal, chars, letter, err,
               lit, number, iter, accept, require, token,
               spaces, word, (-#), (#-)) where
